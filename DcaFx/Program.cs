@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Owin.Hosting;
 using Nancy;
 using Nancy.Bootstrapper;
-using Nancy.Owin;
-using Newtonsoft.Json;
 using Owin;
 
 namespace DcaFx
@@ -19,15 +12,18 @@ namespace DcaFx
     {
         static void Main(string[] args)
         {
-            var startOptions = new StartOptions {Port = 8586};
+            var port = 8586;
+            if (args != null && args.Length > 0)
+            {
+                port = int.Parse(args[0]);
+            }
+            var startOptions = new StartOptions {Port = port};
 
             using (WebApp.Start<Startup>(startOptions))
             {
                 Console.WriteLine("Running on port {0}", startOptions.Port);
-                while (true)
-                {
-                    System.Threading.Thread.Sleep(500);
-                }
+
+                while (true) Thread.Sleep(500);
             }
         }
     }
@@ -70,16 +66,21 @@ namespace DcaFx
     {
         private readonly IMapper _mapper;
 
+        public Parameters(){}
         public Parameters(params dynamic[] values)
         {
-            var config = new MapperConfiguration(cfg => { });
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Parameters, Parameters>();
+            });
             _mapper = config.CreateMapper();
             foreach (var value in values) Map(value);
         }
 
         public void Map(dynamic query)
         {
-            _mapper.Map<dynamic, Parameters>(query, this);
+            var newValues = _mapper.Map<Parameters>(query);
+            _mapper.Map(newValues, this);
         }
 
         public string type { get; set; }
@@ -92,7 +93,7 @@ namespace DcaFx
 
     public class DefaultModule : NancyModule
     {
-        private Adapter _adapter;
+        private readonly Adapter _adapter;
 
         public DefaultModule()
         {
