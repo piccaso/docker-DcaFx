@@ -100,7 +100,7 @@ namespace DcaFx
             }
             else
             {
-                throw new InvalidOperationException($"Unknown format:'{format}'");
+                throw new InvalidOperationException(String.Format("Unknown format:'{0}'", format));
             }
 
 

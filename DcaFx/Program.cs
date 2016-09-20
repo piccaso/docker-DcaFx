@@ -124,7 +124,7 @@ namespace DcaFx
             }
             else
             {
-                response = (Response) $"{parameters.callback}({json});";
+                response = (Response) String.Format("{0}({1});", parameters.callback, json);
                 response.ContentType = "application/javascript";
             }
             return response;
